@@ -64,8 +64,8 @@ const images = [
   },
 ];
 
-const containerGalleryEl = document.querySelector('.gallery');
-containerGalleryEl.innerHTML = createGalleryMarkup(images);
+const galleryEl = document.querySelector('.gallery');
+galleryEl.innerHTML = createGalleryMarkup(images);
 
 function createGalleryMarkup(images) {
   return images.map(({ preview, original, description }) => `
@@ -80,138 +80,40 @@ function createGalleryMarkup(images) {
   </a>
 </li>
   `).join("");
-}
+};
 
 let instance;
+let isShowed = false;
 
-containerGalleryEl.addEventListener('click', (event) => {
+function createModal(source) {
+  const markupModal = `
+    <div class="modal">
+      <img src="${source}"
+      width="1112"
+      height="640">
+    </div>`;
+    instance = basicLightbox.create(markupModal, {
+      onShow: (instance) => {
+        isShowed = true;
+        },
+      onClose: (instance) => {
+        isShowed = false;
+    },
+    closable: true, 
+    });
+    instance.show();
+};
+
+galleryEl.addEventListener('click', (event) => {
   event.preventDefault();
   if (event.target === event.currentTarget) {
     return;
   }
-
-instance = basicLightbox.create(
-  `<div>
-    <img width="1112"
-    height="640"
-    src="${event.target.dataset.source}"
-    alt="${event.target.alt}">
-  </div>`
-  );
-  instance.show();
-
-window.addEventListener('keyup', ({ code }) => {
-  if (code !== 'Escape') {
-    return;
-  }
-  instance.close();
-  });
-
+  createModal(event.target.dataset.source);
 });
 
-// const containerGalleryEl = document.querySelector('.gallery');
-
-// function createGalleryMarkup({ preview, description, original }) {
-//   const markup =
-//   `<li class="gallery-item">
-//   <a class="gallery-link" href="${original}" onclick="event.preventDefault();">
-//     <img
-//       class="gallery-image"
-//       src="${preview}"
-//       data-source="${original}"
-//       alt="${description}"
-//     />
-//   </a>
-// </li>`
-//   return markup;
-// }
-
-// let markup = "";
-
-// for (let image of images) {
-//   markup += createGalleryMarkup(image);
-// }
-
-// containerGalleryEl.innerHTML = markup;
-
-// containerGalleryEl.addEventListener('click', (event) => {
-//   if (event.target === event.currentTarget) {
-//     return;
-//   }
-  
-//   const imageBig = event.target.closest('.gallery-item');
-//   console.log('Click', imageBig);
-// });
-
-// let instance;
-
-// containerGalleryEl.addEventListener('click', function (event) {
-//   event.preventDefault();
-//   if (event.target === event.currentTarget) {
-//     return;
-//   }
-//   instance = basicLightbox.create(
-//     `<div>
-//       <img width="1112"
-//       height="640"
-//       src="${event.target.src}"
-//       alt="${event.target.alt}">
-//     </div>`
-//   );
-//   instance.show();
-// });
-
-// containerGalleryEl.addEventListener('keyup', ({ code }) => {
-//   if (code !== 'Escape') {
-//     return;
-//   }
-//   instance.close();
-// });
-
-
-
-
-// ❌ 1. Завдання вирішено неправильно
-
-// Добре виконані моменти:
-
-// Гарне використання шаблонних літералів: функції createGalleryMarkup та цикл створення markup ефективно використовують шаблонні
-// літерали для створення HTML-рядків на основі масиву images.
-
-// Структурований та зрозумілий код: код розбитий на функції та структурований таким чином, що легко зрозуміти логіку та
-// послідовність дій.
-
-// Описові назви змінних: змінні, такі як containerGalleryEl та imageBig, є описовими та дають чітке розуміння того,
-// що вони представляють.
-
-// Критичні помилки:
-
-// Створення модального вікна: модальне вікно правильно створюється за допомогою методу basicLightbox.create(),
-// коли натискається на елемент галереї. Однак атрибут src великого зображення має бути отримано з атрибуту data-source,
-// а не з атрибуту src натиснутого зображення. Це потрібно змінити, щоб задовольнити вимоги завдання.
-
-// Обробник подій для клавіатурних подій: наразі обробник подій для клавіатури прив'язано до containerGalleryEl,
-// замість глобального об'єкту window або document. Це означає, що він не буде виявляти натискання клавіш, якщо контейнер галереї
-// не у фокусі, що малоймовірно. Він повинен слухати події натискання клавіш на більш глобальному рівні, щоб коректно працювати.
-
-// Сфера дії та розміщення обробника подій: більше того, обробник подій для клавіатурних подій додано, але ніколи не видаляється,
-// що може призвести до непотрібно активних обробників подій, коли модальне вікно не видиме. Він повинен слухати тільки тоді,
-// коли модальне вікно відкрите.
-
-// Обробник подій для закриття модального вікна: модальне вікно має закриватися за допомогою клавіші Escape, проте обробник
-// перевіряє події 'keyup', серед яких 'Escape' не обробляється правильно, оскільки випадки, коли натискається Escape,
-// ймовірніше використовують 'keydown'. Також немає перевірки, чи модальне вікно насправді показане перед спробою його закриття.
-
-// Поліпшення:
-
-// Неслідкуваність у обробці подій: обробка подій для запобігання стандартній поведінці на якірних тегах розкидана по всьому коду.
-// Її можна було б впорядкувати, прикріпивши один обробник подій до контейнера галереї для обробки кліків на якірних тегах.
-
-// Організація службових функцій: ви могли б організувати createGalleryMarkup як окрему повторно використовувану службову функцію
-// поза основним блоком логіки, щоб покращити загальну організацію коду та розділення відповідальності.
-
-// Завдання не було прийняте через критичні помилки, які потрібно виправити. Будь ласка, врахуйте наданий зворотний зв'язок і
-// зробіть необхідні корекції, зокрема переконайтеся, що велике зображення відображається правильно, а функціональність закриття
-// модального вікна за допомогою клавіатури правильно реалізована з обробниками подій, які додаються та видаляються у відповідні часи.
-
-// Як тільки ці проблеми будуть вирішені та код працюватиме згідно з вимогами завдання, він буде готовий до прийняття.
+document.addEventListener('keydown', ({ code }) => {
+  if (code === "Escape" && isShowed === true) {
+    instance.close();
+  }
+});
