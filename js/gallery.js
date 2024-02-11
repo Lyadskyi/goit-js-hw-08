@@ -65,11 +65,12 @@ const images = [
 ];
 
 const containerGalleryEl = document.querySelector('.gallery');
+containerGalleryEl.innerHTML = createGalleryMarkup(images);
 
-function createGalleryMarkup({ preview, description, original }) {
-  const markup =
-  `<li class="gallery-item">
-  <a class="gallery-link" href="${original}" onclick="event.preventDefault();">
+function createGalleryMarkup(images) {
+  return images.map(({ preview, original, description }) => `
+  <li class="gallery-item">
+  <a class="gallery-link" href="${original}">
     <img
       class="gallery-image"
       src="${preview}"
@@ -77,48 +78,90 @@ function createGalleryMarkup({ preview, description, original }) {
       alt="${description}"
     />
   </a>
-</li>`
-  return markup;
+</li>
+  `).join("");
 }
-
-let markup = "";
-
-for (let image of images) {
-  markup += createGalleryMarkup(image);
-}
-
-containerGalleryEl.innerHTML = markup;
-
-containerGalleryEl.addEventListener('click', (event) => {
-  if (event.target === event.currentTarget) {
-    return;
-  }
-  
-  const imageBig = event.target.closest('.gallery-item');
-  console.log('Click', imageBig);
-});
 
 let instance;
 
-containerGalleryEl.addEventListener('click', function (event) {
+containerGalleryEl.addEventListener('click', (event) => {
   event.preventDefault();
   if (event.target === event.currentTarget) {
     return;
   }
-  instance = basicLightbox.create(
-    `<div>
-      <img width="1112"
-      height="640"
-      src="${event.target.src}"
-      alt="${event.target.alt}">
-    </div>`
+
+instance = basicLightbox.create(
+  `<div>
+    <img width="1112"
+    height="640"
+    src="${event.target.dataset.source}"
+    alt="${event.target.alt}">
+  </div>`
   );
   instance.show();
 });
-
 containerGalleryEl.addEventListener('keyup', ({ code }) => {
   if (code !== 'Escape') {
     return;
   }
   instance.close();
 });
+
+// const containerGalleryEl = document.querySelector('.gallery');
+
+// function createGalleryMarkup({ preview, description, original }) {
+//   const markup =
+//   `<li class="gallery-item">
+//   <a class="gallery-link" href="${original}" onclick="event.preventDefault();">
+//     <img
+//       class="gallery-image"
+//       src="${preview}"
+//       data-source="${original}"
+//       alt="${description}"
+//     />
+//   </a>
+// </li>`
+//   return markup;
+// }
+
+// let markup = "";
+
+// for (let image of images) {
+//   markup += createGalleryMarkup(image);
+// }
+
+// containerGalleryEl.innerHTML = markup;
+
+// containerGalleryEl.addEventListener('click', (event) => {
+//   if (event.target === event.currentTarget) {
+//     return;
+//   }
+  
+//   const imageBig = event.target.closest('.gallery-item');
+//   console.log('Click', imageBig);
+// });
+
+// let instance;
+
+// containerGalleryEl.addEventListener('click', function (event) {
+//   event.preventDefault();
+//   if (event.target === event.currentTarget) {
+//     return;
+//   }
+//   instance = basicLightbox.create(
+//     `<div>
+//       <img width="1112"
+//       height="640"
+//       src="${event.target.src}"
+//       alt="${event.target.alt}">
+//     </div>`
+//   );
+//   instance.show();
+// });
+
+// containerGalleryEl.addEventListener('keyup', ({ code }) => {
+//   if (code !== 'Escape') {
+//     return;
+//   }
+//   instance.close();
+// });
